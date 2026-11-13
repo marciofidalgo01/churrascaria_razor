@@ -1,0 +1,209 @@
+
+@page
+@model Churrascaria.Pages.Agendamento.NovoModel
+@inject Microsoft.Extensions.Options.IOptions<EmpresaOptions> EmpresaConfig
+@{
+    ViewData["Title"] = "Solicitar orçamento";
+    var protocolo = Model.ProtocoloRecebido;
+}
+
+<section class="booking-intro container">
+    <a class="back-link" asp-page="/Index">← Voltar ao início</a>
+    <p class="eyebrow">VAMOS PLANEJAR JUNTOS</p>
+    <h1>Conte sobre<br /><em>o seu evento.</em></h1>
+    <p>Preencha os detalhes e a equipe entra em contato para combinar o serviço.</p>
+</section>
+
+<section class="container booking-grid">
+    <aside class="booking-aside">
+        <div class="aside-note">
+            <span class="note-label">COMO FUNCIONA</span>
+            <h2>Um bom churrasco<br />começa aqui.</h2>
+            <ol>
+                <li>Você envia os detalhes.</li>
+                <li>Conferimos a disponibilidade.</li>
+                <li>Combinamos o orçamento e confirmamos a data.</li>
+            </ol>
+            <p class="note-foot">
+                O envio é uma solicitação.<br />
+                A confirmação é feita pela equipe.
+            </p>
+        </div>
+
+        @if (EmpresaConfig.Value.LinkWhatsApp != null)
+        {
+            <p class="aside-contact">
+                Prefere conversar primeiro?<br />
+                <a href="@EmpresaConfig.Value.LinkWhatsApp"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Fale com a gente no WhatsApp ↗
+                </a>
+            </p>
+        }
+    </aside>
+
+    <div class="booking-form-card">
+        @if (!string.IsNullOrEmpty(protocolo))
+        {
+            <div class="success-message" role="status">
+                <span class="success-icon" aria-hidden="true">✓</span>
+                <div>
+                    <h2>Solicitação recebida!</h2>
+                    <p>
+                        Seu pedido foi salvo. A equipe entrará em contato
+                        pelos dados informados.
+                    </p>
+                    <p>
+                        Protocolo: <strong>@protocolo</strong>.
+                        Aguarde a confirmação da data.
+                    </p>
+                </div>
+            </div>
+        }
+
+        <form method="post" class="booking-form" data-booking-form>
+            <div asp-validation-summary="All"
+                 class="validation-summary"
+                 role="alert"></div>
+
+            <div class="honeypot" aria-hidden="true">
+                <label asp-for="Website">Website</label>
+                <input asp-for="Website"
+                       tabindex="-1"
+                       autocomplete="off" />
+            </div>
+
+            <div class="form-section-title">
+                <span>01</span>
+                <h2>Informações para contato</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label asp-for="Agendamento.NomeCliente"></label>
+                    <input asp-for="Agendamento.NomeCliente"
+                           placeholder="Nome e sobrenome"
+                           autocomplete="name"
+                           maxlength="100"
+                           required />
+                    <span asp-validation-for="Agendamento.NomeCliente"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Agendamento.Telefone"></label>
+                   <input asp-for="Agendamento.Telefone"
+                        type="tel"
+                        placeholder="(21) 99999-9999"
+                        autocomplete="tel"
+                        maxlength="15"
+                        inputmode="numeric"
+                        data-phone-mask
+                        required />
+                    <span asp-validation-for="Agendamento.Telefone"></span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label asp-for="Agendamento.Email">
+                    E-mail <small>(opcional)</small>
+                </label>
+                <input asp-for="Agendamento.Email"
+                       type="email"
+                       placeholder="seuemail@exemplo.com"
+                       autocomplete="email"
+                       maxlength="254" />
+                <span asp-validation-for="Agendamento.Email"></span>
+                <small>
+                    Para receber notificações.
+                </small>
+            </div>
+
+            <div class="form-section-title">
+                <span>02</span>
+                <h2>O evento</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label asp-for="Agendamento.TipoEvento"></label>
+                    <select asp-for="Agendamento.TipoEvento" required>
+                        <option value="">Selecione a ocasião</option>
+                        @foreach (var tipo in DadosAgendamento.TiposEvento)
+                        {
+                            <option value="@tipo">@tipo</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Agendamento.TipoEvento"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Agendamento.QuantidadePessoas"></label>
+                    <input asp-for="Agendamento.QuantidadePessoas"
+                           type="number"
+                           min="1"
+                           max="1000"
+                           placeholder="Uma estimativa já ajuda"
+                           required />
+                    <span asp-validation-for="Agendamento.QuantidadePessoas"></span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label asp-for="Agendamento.DataHora"></label>
+                    <input asp-for="Agendamento.DataHora"
+                           type="datetime-local"
+                           min="@Model.DataMinima"
+                           required />
+                    <span asp-validation-for="Agendamento.DataHora"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Agendamento.Cidade"></label>
+                    <input asp-for="Agendamento.Cidade"
+                           placeholder="Onde será o evento?"
+                           maxlength="100"
+                           required />
+                    <span asp-validation-for="Agendamento.Cidade"></span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label asp-for="Agendamento.LocalEvento"></label>
+                <input asp-for="Agendamento.LocalEvento"
+                       placeholder="Endereço, salão ou local previsto"
+                       maxlength="200"
+                       required />
+                <span asp-validation-for="Agendamento.LocalEvento"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Agendamento.Observacoes"></label>
+                <textarea asp-for="Agendamento.Observacoes"
+                          rows="4"
+                          maxlength="1500"
+                          placeholder="Preferências de cardápio, estrutura do local ou dúvidas..."></textarea>
+                <span asp-validation-for="Agendamento.Observacoes"></span>
+                
+            </div>
+
+            <div class="form-footer">
+                <p>
+                    Usaremos seus dados para responder a este pedido.
+                    <a asp-page="/Privacidade">Saiba mais</a>.
+                </p>
+
+                <button class="button button-primary"
+                        type="submit"
+                        data-submit>
+                    Enviar solicitação <span aria-hidden="true">↗</span>
+                </button>
+
+                <small>
+                    Sem confirmação automática. Orçamento e disponibilidade a combinar.
+                </small>
+            </div>
+        </form>
+    </div>
+</section>

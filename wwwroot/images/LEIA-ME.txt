@@ -1,0 +1,11 @@
+Inclua nesta pasta as fotos reais autorizadas do cliente.
+Depois configure FotoPrincipal e Portfolio na seção Empresa de appsettings.json.
+
+Exemplos de nomes:
+churrasqueiro-no-evento.jpg
+preparo-01.jpg
+mesa-01.jpg
+evento-01.jpg
+
+Nenhuma fotografia real do cliente foi fornecida no ZIP original.
+fire.png foi reaproveitado da identidade visual enviada.

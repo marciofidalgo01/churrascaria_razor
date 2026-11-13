@@ -1,0 +1,61 @@
+@inject Microsoft.Extensions.Options.IOptions<EmpresaOptions> EmpresaConfig
+@{
+    var empresa = EmpresaConfig.Value;
+    var titulo = ViewData["Title"] as string;
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@titulo · @empresa.Nome</title>
+    <meta name="description" content="@empresa.Descricao" />
+    <meta name="theme-color" content="#1a1512" />
+    <link rel="icon" type="image/png" href="~/images/fire.png" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" asp-page="/Index" aria-label="@empresa.Nome — início">
+                <img src="~/images/fire.png" alt="" width="34" height="34" />
+                <span><strong>@empresa.Nome</strong><small>CHURRASCO PARA EVENTOS</small></span>
+            </a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-principal">
+                <span class="menu-lines" aria-hidden="true"></span><span>Menu</span>
+            </button>
+            <nav id="menu-principal" class="main-nav" aria-label="Navegação principal">
+                <a asp-page="/Index" asp-fragment="sobre">Nosso serviço</a>
+                <a asp-page="/Index" asp-fragment="eventos">Eventos</a>
+                <a asp-page="/Index" asp-fragment="portfolio">Portfólio</a>
+                <a class="button button-primary button-small" asp-page="/Agendamento/Novo">Pedir orçamento <span aria-hidden="true">↗</span></a>
+            </nav>
+        </div>
+    </header>
+    <main id="conteudo">
+        @RenderBody()
+    </main>
+    <footer class="site-footer">
+        <div class="container footer-top">
+            <div>
+                <a class="brand" asp-page="/Index"><img src="~/images/fire.png" alt="" width="32" height="32" /><span><strong>@empresa.Nome</strong><small>CHURRASCO PARA EVENTOS</small></span></a>
+                <p>Você reúne as pessoas.<br />A gente cuida da brasa.</p>
+            </div>
+            <div><p class="footer-heading">Vamos conversar?</p><a asp-page="/Agendamento/Novo">Solicitar orçamento <span aria-hidden="true">↗</span></a>
+                @if (empresa.LinkWhatsApp != null)
+                { <a href="@empresa.LinkWhatsApp" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a> }
+                @if (empresa.LinkInstagram != null)
+                { <a href="@empresa.LinkInstagram" target="_blank" rel="noopener noreferrer">Instagram</a> }
+                <small>@empresa.Regiao</small>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <small>© @DateTime.UtcNow.Year @empresa.Nome</small>
+            <div><a asp-page="/Privacidade">Privacidade</a><a asp-page="/Conta/Entrar">Área da equipe</a></div>
+        </div>
+    </footer>
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

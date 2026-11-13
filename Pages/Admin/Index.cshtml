@@ -1,0 +1,29 @@
+@page
+@model Churrascaria.Pages.Admin.IndexModel
+@{ ViewData["Title"] = "Solicitações de eventos"; }
+<section class="section container admin-section">
+    <div class="admin-heading"><div><p class="eyebrow">ÁREA DA EQUIPE</p><h1>Agenda de eventos.</h1><p>@Model.Pendentes solicitações aguardando análise.</p></div><form method="post" asp-page="/Conta/Sair"><button type="submit" class="button button-outline">Sair</button></form></div>
+    @if (Model.Mensagem != null) { <p class="notice" role="status">@Model.Mensagem</p> }
+    <form method="get" class="admin-filters"><div class="field"><label asp-for="Data">Data do evento</label><input asp-for="Data" type="date" /></div><div class="field"><label asp-for="Status">Status</label><select asp-for="Status"><option value="">Todos</option><option value="Solicitado">Solicitado</option><option value="Confirmado">Confirmado</option><option value="Concluido">Concluído</option><option value="Cancelado">Cancelado</option></select></div><button type="submit" class="button button-primary">Filtrar</button><a asp-page="./Index" class="text-link dark-link">Limpar filtros</a></form>
+    <p class="results-count">@Model.Total pedidos encontrados · página @Model.Pagina de @Model.TotalPaginas</p>
+    @if (Model.Agendamentos.Count == 0)
+    { <div class="portfolio-empty"><div><h2>Nenhum pedido por aqui.</h2><p>As solicitações recebidas pelo formulário aparecerão nesta área.</p></div></div> }
+    <div class="request-list">
+        @foreach (var pedido in Model.Agendamentos)
+        {
+            <article class="request-card">
+                <div class="request-top"><div><p class="request-date">@pedido.DataHora.ToString("dd MMM yyyy") <span>· @pedido.DataHora.ToString("HH:mm")</span></p><h2>@pedido.NomeCliente</h2></div><span class="badge badge-@pedido.Status.ToString().ToLowerInvariant()">@(pedido.Status == StatusAgendamento.Concluido ? "Concluído" : pedido.Status.ToString())</span></div>
+                <dl class="request-details"><div><dt>Ocasião</dt><dd>@pedido.TipoEvento</dd></div><div><dt>Convidados</dt><dd>@pedido.QuantidadePessoas pessoas</dd></div><div><dt>Cidade / bairro</dt><dd>@pedido.Cidade</dd></div><div><dt>Telefone</dt><dd><a href="tel:+@(pedido.Telefone.StartsWith("55") && pedido.Telefone.Length >= 12 ? pedido.Telefone : "55" + pedido.Telefone)">@pedido.Telefone</a></dd></div></dl>
+                <details class="request-more"><summary>Ver local e detalhes</summary><p><strong>Local:</strong> @pedido.LocalEvento</p>@if (!string.IsNullOrEmpty(pedido.Observacoes)) { <p class="preserve-lines">@pedido.Observacoes</p> }<small>Protocolo @pedido.Protocolo · recebido em @pedido.CriadoEmUtc.ToString("dd/MM/yyyy HH:mm") UTC</small></details>
+                @if (pedido.Status is StatusAgendamento.Solicitado or StatusAgendamento.Confirmado)
+                {
+                    <div class="request-actions"><form method="post" asp-page-handler="Status" asp-route-Data="@(Model.Data?.ToString("yyyy-MM-dd"))" asp-route-Status="@Model.Status" asp-route-Pagina="@Model.Pagina"><input type="hidden" name="id" value="@pedido.Id" />
+                        @if (pedido.Status == StatusAgendamento.Solicitado) { <button class="button button-primary button-small" type="submit" name="novoStatus" value="Confirmado" data-confirm="Você já combinou o orçamento e verificou a disponibilidade da equipe?">Confirmar evento</button> }
+                        else { <button class="button button-primary button-small" type="submit" name="novoStatus" value="Concluido">Marcar como concluído</button> }
+                        <button class="button button-outline button-small" type="submit" name="novoStatus" value="Cancelado" data-confirm="Deseja cancelar este pedido?">Cancelar</button></form><small>Verifique a disponibilidade da equipe antes de confirmar.</small></div>
+                }
+            </article>
+        }
+    </div>
+    <nav class="pagination" aria-label="Páginas de pedidos">@if (Model.Pagina > 1) { <a class="button button-outline button-small" asp-route-Pagina="@(Model.Pagina - 1)" asp-route-Data="@(Model.Data?.ToString("yyyy-MM-dd"))" asp-route-Status="@Model.Status">← Anterior</a> }@if (Model.Pagina < Model.TotalPaginas) { <a class="button button-outline button-small" asp-route-Pagina="@(Model.Pagina + 1)" asp-route-Data="@(Model.Data?.ToString("yyyy-MM-dd"))" asp-route-Status="@Model.Status">Próxima →</a> }</nav>
+</section>
